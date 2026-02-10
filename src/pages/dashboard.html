@@ -1,0 +1,252 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - ISET Magasin</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/inventory-table.css">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">ISET Magasin</div>
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="dashboard.html" class="active">Tableau de bord</a></li>
+                <li><a href="browse-inventory.html" title="Consulter l'inventaire en ligne">📦 Inventaire en ligne</a></li>
+                <li><a href="stats.html">Statistiques</a></li>
+                <li><a href="gestion.html">Gestion</a></li>
+                <li><a href="#" id="logoutBtn">Déconnexion</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="header-dashboard">
+            <h1>Tableau de bord</h1>
+            <p id="welcome"></p>
+        </div>
+
+        <!-- Statistiques rapides -->
+        <section id="statsSection" class="stats-grid">
+            <div class="stat-card">
+                <h3>Articles en stock</h3>
+                <p id="totalItems" class="stat-number">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Stock faible (< 5)</h3>
+                <p id="lowStockCount" class="stat-number stat-warning">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Utilisateurs actifs</h3>
+                <p id="userCount" class="stat-number">0</p>
+            </div>
+        </section>
+
+        <!-- Section Inventaire (visible pour admin, magasinier, autres) -->
+        <section id="inventorySection" style="display:none;">
+            <div class="section-header">
+                <h2 id="inventoryTitle" style="cursor: pointer; user-select: none; color: #0e2a36; font-weight: bold;">
+                    📦 Inventaire <span id="toggleIcon">▼</span>
+                </h2>
+                <div id="inventoryControls" class="action-buttons" style="display: none; flex-wrap: wrap; gap: 10px;">
+                    <input type="text" id="searchInput" placeholder="Rechercher un article..." style="flex: 1; min-width: 200px;">
+                    <button id="addItemBtn" class="btn-primary">+ Ajouter article</button>
+                    <button id="importCsvBtn" class="btn-secondary">📥 Importer Excel/CSV</button>
+                    <a href="exemples/inventaire_exemple.csv" download="inventaire_exemple.csv" class="btn-secondary" style="text-decoration: none; display: inline-block; padding: 8px 12px; border-radius: 4px; background-color: #6c757d; color: white; font-size: 14px;">📋 Modèle CSV</a>
+                    <button id="exportInventory" class="btn-secondary">📤 Exporter (CSV)</button>
+                    <a href="diagnostic.html" class="btn-secondary" style="text-decoration: none; display: inline-block; padding: 8px 12px; border-radius: 4px; background-color: #6c757d; color: white; font-size: 14px;">🔧 Diagnostic</a>
+                </div>
+            </div>
+
+            <!-- Tableau d'inventaire -->
+            <div id="inventoryTableContainer" style="display: none; overflow-x: auto;">
+                <table id="inventoryTable" class="inventory-table-enhanced">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Catégorie</th>
+                            <th>Marque</th>
+                            <th>Quantité</th>
+                            <th>Emplacement</th>
+                            <th style="text-align: center;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryBody">
+                        <!-- J'y insère les lignes dynamiquement -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Input file caché pour import -->
+            <input type="file" id="csvImportInput" style="display: none;" accept=".csv,.xlsx" />
+        </section>
+
+        <!-- Section Administration (visible pour admin, dev) -->
+        <section id="adminSection" style="display:none;">
+            <h2>Administration</h2>
+            <div class="admin-cards">
+                <div class="card">
+                    <h3>📦 Inventaire en ligne</h3>
+                    <p>Consulter et gérer l'inventaire complet en temps réel avec recherche avancée.</p>
+                    <button class="btn-primary" onclick="window.location.href='browse-inventory.html'" style="background: #3498db;">Accéder</button>
+                </div>
+                <div class="card">
+                    <h3>Gestion des utilisateurs</h3>
+                    <p>Ajouter, modifier ou supprimer des utilisateurs et leurs droits d'accès.</p>
+                    <button class="btn-primary" onclick="openUserAdminModal()">Gérer utilisateurs</button>
+                </div>
+                <div class="card">
+                    <h3>Paramètres système</h3>
+                    <p>Configurer les catégories, les seuils de stock et les permissions.</p>
+                    <button class="btn-primary" onclick="window.location.href='settings.html'">Paramètres</button>
+                </div>
+                <div class="card">
+                    <h3>Logs et audit</h3>
+                    <p>Consulter l'historique des modifications et les actions des utilisateurs.</p>
+                    <button class="btn-primary" onclick="openLogsAuditModal()">Voir les logs</button>
+                </div>
+                <div class="card">
+                    <h3>Rapports</h3>
+                    <p>Générer des rapports détaillés sur l'inventaire et les utilisateurs.</p>
+                    <button class="btn-primary" onclick="openReportsModal()">Générer rapport</button>
+                </div>
+                <div class="card">
+                    <h3>Demandes de réapprovisionnement</h3>
+                    <p>Voir et gérer les demandes de réapprovisionnement.</p>
+                    <button class="btn-primary" onclick="openRestockRequestsModal()" style="background: #27ae60;">📋 Gérer les demandes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Magasinier (visible pour magasinier) -->
+        <section id="magasinierSection" style="display:none;">
+            <h2>Gestion des entrées/sorties</h2>
+            <div class="magasinier-cards">
+                <div class="card">
+                    <h3>📦 Inventaire en ligne</h3>
+                    <p>Consulter et gérer l'inventaire complet en temps réel avec recherche avancée.</p>
+                    <button class="btn-primary" onclick="window.location.href='browse-inventory.html'" style="background: #3498db;">Accéder</button>
+                </div>
+                <div class="card">
+                    <h3>Entrée de stock</h3>
+                    <p>Enregistrer l'arrivée de nouveaux articles.</p>
+                    <button class="btn-primary" onclick="openStockEntryModal()">Nouvelle entrée</button>
+                </div>
+                <div class="card">
+                    <h3>Sortie de stock</h3>
+                    <p>Enregistrer la sortie d'articles.</p>
+                    <button class="btn-primary" onclick="openStockExitModal()">Nouvelle sortie</button>
+                </div>
+                <div class="card">
+                    <h3>Demandes de réapprovisionnement</h3>
+                    <p>Voir et valider les demandes de réapprovisionnement.</p>
+                    <button class="btn-primary" onclick="openRestockRequestsModal()">📋 Gérer les demandes</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Visiteur/Lecteur (visible pour visiteur) -->
+        <section id="visiteurSection" style="display:none;">
+            <div class="section-header">
+                <h2 style="display: flex; align-items: center; gap: 10px; color: #0e2a36;">
+                    👁️ Consultation de l'inventaire
+                </h2>
+                <p style="margin: 10px 0; color: #666; font-size: 14px;">Vous pouvez consulter l'inventaire en lecture seule.</p>
+                <div style="display: flex; gap: 10px; align-items: center; margin-top: 15px;">
+                    <input type="text" id="searchInputVisiteur" placeholder="Rechercher un article (ID, nom, catégorie, lieu)..." style="flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;" />
+                    <button id="resetSearchVisiteur" class="btn-secondary" style="padding: 8px 16px; white-space: nowrap;">🔄 Réinitialiser</button>
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 20px;">
+                <table id="inventoryTableVisiteur" class="inventory-table-enhanced">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Catégorie</th>
+                            <th>Quantité</th>
+                            <th>Emplacement</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventoryBodyVisiteur">
+                        <!-- Tableau en lecture seule -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section Autres statuts personnalisés -->
+        <section id="autresSection" style="display:none;">
+            <h2>Autres</h2>
+            <p id="customRoleDisplay"></p>
+            <p>Accès limité — consultez votre administrateur pour plus de droits.</p>
+        </section>
+
+    </main>
+
+    <!-- Modal pour ajouter/modifier article -->
+    <div id="itemModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle">Ajouter un article</h2>
+            <form id="itemForm">
+                <div class="form-group">
+                    <label>ID article</label>
+                    <input type="text" id="itemId" placeholder="P001" required>
+                </div>
+                <div class="form-group">
+                    <label>Nom</label>
+                    <input type="text" id="itemName" placeholder="Clavier USB" required>
+                </div>
+                <div class="form-group">
+                    <label>Catégorie</label>
+                    <input type="text" id="itemCategory" placeholder="Périphériques" required>
+                </div>
+                <div class="form-group">
+                    <label>Quantité</label>
+                    <input type="number" id="itemQty" placeholder="25" required>
+                </div>
+                <div class="form-group">
+                    <label>Marque</label>
+                    <input type="text" id="itemBrand" placeholder="Logitech" required>
+                </div>
+                <div class="form-group">
+                    <label>Emplacement</label>
+                    <input type="text" id="itemLocation" placeholder="Rayon A" required>
+                </div>
+                <button type="submit" class="btn-primary">Enregistrer</button>
+                <button type="button" class="btn-secondary" id="cancelBtn">Annuler</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal pour entrée de stock -->
+    <div id="stockEntryModal" class="modal" style="display:none;"></div>
+
+    <!-- Modal pour sortie de stock -->
+    <div id="stockExitModal" class="modal" style="display:none;"></div>
+
+<script src="../scripts/data-cleaner.js"></script>
+<script src="../scripts/init-demo-data.js"></script>
+<script src="../scripts/stats-display.js"></script>
+<script src="../scripts/dashboard.js"></script>
+<script src="../scripts/inventory.js"></script>
+<script src="../scripts/inventory-ui.js"></script>
+<script src="../scripts/inventory-visiteur.js"></script>
+<script src="../scripts/quick-add-items.js"></script>
+<script src="../scripts/export.js"></script>
+<script src="../scripts/csv-import.js"></script>
+<script src="../scripts/stock-entry.js"></script>
+<script src="../scripts/stock-exit.js"></script>
+<script src="../scripts/user-admin.js"></script>
+<script src="../scripts/logs-audit.js"></script>
+<script src="../scripts/reports.js"></script>
+<script src="../scripts/restock-requests.js"></script>
+</body>
+</html>
+
+

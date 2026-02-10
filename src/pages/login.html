@@ -1,0 +1,215 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>ISET Stock | Connexion</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body class="auth-body">
+
+    <div class="auth-container">
+        <div class="auth-overlay">
+            <main class="auth-card">
+                <div class="auth-header">
+                    <img src="../assets/images/Logo_iset.png" alt="Logo ISET" class="logo-mini">
+                    <h2>Portail Magasin ISET</h2>
+                    <p>Connectez-vous avec votre identifiant académique</p>
+                </div>
+            
+                <form id="authForm">
+                    <div class="input-group">
+                        <label>Mode</label>
+                        <select id="authMode" required>
+                            <option value="login">Se connecter</option>
+                            <option value="register">Créer un compte</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group" id="nameGroup" style="display:none;">
+                        <label>Nom complet</label>
+                        <input type="text" id="userName" placeholder="Entrez votre nom">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" id="userEmail" placeholder="ex: alice@iset.local" required>
+                    </div>
+
+                    <div class="input-group" id="roleGroup" style="display:none;">
+                        <label>Rôle au sein de l'institut</label>
+                        
+                        <select id="userRoleSelect">
+                            <option value="" disabled selected>-- Sélectionnez votre rôle --</option>
+                            <option value="visiteur">👤 Étudiant / Enseignant (Visiteur)</option>
+                            <option value="autre">❓ Autre statut</option>
+                            <!-- ⚠️ Admin et Magasinier sont MASQUÉS pour l'inscription normale -->
+                        </select>
+                        <input type="text" id="userRoleCustom" placeholder="Entrez votre statut si 'Autre'" style="display:none; margin-top:10px;">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Mot de passe</label>
+                        <input type="password" id="userPassword" placeholder="Entrez votre mot de passe" required>
+                    </div>
+
+                    <div id="messageBox" style="margin: 15px 0; padding: 10px; border-radius: 4px; text-align: center; display:none; font-weight: bold;"></div>
+
+                    <button type="submit" class="btn-auth" id="submitBtn">Se connecter</button>
+                </form>
+                
+                <div style="margin-top: 15px; text-align: center; font-size: 0.9rem; color: #666;">
+                    <p id="modeHint">Pas de compte ? Sélectionnez "Créer un compte" ci-dessus</p>
+                </div>
+            
+                <div class="auth-footer">
+                    <p>Système de gestion interne - ISET 2026</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="../scripts/auth-advanced.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function(){
+            const modeSelect = document.getElementById('authMode');
+            const nameInput = document.getElementById('userName');
+            const nameGroup = document.getElementById('nameGroup');
+            const roleGroup = document.getElementById('roleGroup');
+            const roleSelect = document.getElementById('userRoleSelect');
+            const roleCustom = document.getElementById('userRoleCustom');
+            const submitBtn = document.getElementById('submitBtn');
+            const modeHint = document.getElementById('modeHint');
+            const messageBox = document.getElementById('messageBox');
+            const form = document.getElementById('authForm');
+            
+            function updateFormMode(){
+                if(modeSelect.value === 'login'){
+                    nameGroup.style.display = 'none';
+                    roleGroup.style.display = 'none';
+                    nameInput.required = false;
+                    roleSelect.required = false;
+                    submitBtn.textContent = 'Se connecter';
+                    modeHint.textContent = 'Pas de compte ? Sélectionnez "Créer un compte" ci-dessus';
+                } else {
+                    nameGroup.style.display = 'block';
+                    roleGroup.style.display = 'block';
+                    nameInput.required = true;
+                    roleSelect.required = true;
+                    submitBtn.textContent = 'Créer mon compte';
+                    modeHint.textContent = 'Vous avez déjà un compte ? Sélectionnez "Se connecter" ci-dessus';
+                }
+                messageBox.style.display = 'none';
+            }
+            
+            roleSelect.addEventListener('change', function(){
+                if(this.value === 'autre'){
+                    roleCustom.style.display = 'block';
+                    roleCustom.required = true;
+                } else {
+                    roleCustom.style.display = 'none';
+                    roleCustom.value = '';
+                    roleCustom.required = false;
+                }
+            });
+            
+            modeSelect.addEventListener('change', updateFormMode);
+            updateFormMode();
+            
+            form.addEventListener('submit', function(e){
+                e.preventDefault();
+                const mode = modeSelect.value;
+                const email = document.getElementById('userEmail').value.trim();
+                const password = document.getElementById('userPassword').value;
+                
+                if(!email || !password){
+                    showMessage('Veuillez remplir tous les champs requis', 'error');
+                    return;
+                }
+                
+                if(mode === 'login'){
+                    handleLogin(email, password);
+                } else {
+                    const name = nameInput.value.trim();
+                    let role = roleSelect.value;
+                    let customRole = '';
+                    
+                    if(!name){
+                        showMessage('Veuillez entrer votre nom', 'error');
+                        return;
+                    }
+                    if(!role){
+                        showMessage('Veuillez sélectionner un rôle', 'error');
+                        return;
+                    }
+                    if(role === 'autre'){
+                        customRole = roleCustom.value.trim();
+                        if(!customRole){
+                            showMessage('Veuillez indiquer votre statut personnalisé', 'error');
+                            return;
+                        }
+                        role = 'autres';
+                    } else if(role === 'visiteur'){
+                        // C'est bon, visiteur par défaut
+                    } else {
+                        // ⛔ SÉCURITÉ: Les rôles Magasinier/Admin ne peuvent JAMAIS être choisis ici
+                        if(role === 'admin' || role === 'magasinier'){
+                            showMessage('❌ Erreur: Les rôles Magasinier et Admin ne sont accessibles que via l\'administrateur!', 'error');
+                            return;
+                        }
+                    }
+                    handleRegister(name, email, password, role, customRole);
+                }
+            });
+            
+            function showMessage(msg, type){
+                messageBox.textContent = msg;
+                messageBox.style.display = 'block';
+                messageBox.style.backgroundColor = type === 'error' ? '#f8d7da' : '#d4edda';
+                messageBox.style.color = type === 'error' ? '#721c24' : '#155724';
+            }
+            
+            function handleLogin(email, password){
+                const result = window.AuthSystem.loginUser(email, password);
+                if(result.success){
+                    const sessionUser = {
+                        id: result.user.id,
+                        name: result.user.name,
+                        email: result.user.email,
+                        role: result.user.role,
+                        customRole: '',
+                        isDeveloper: result.user.isDeveloper,
+                        loginTime: new Date().toISOString()
+                    };
+                    localStorage.setItem('iset_user', JSON.stringify(sessionUser));
+                    localStorage.setItem('iset_session', JSON.stringify(sessionUser));
+                    window.location.href = 'dashboard.html';
+                } else {
+                    showMessage('❌ ' + result.message, 'error');
+                }
+            }
+            
+            function handleRegister(name, email, password, role, customRole){
+                const result = window.AuthSystem.registerUser(name, email, password, role);
+                if(result.success){
+                    const sessionUser = {
+                        id: result.user.id,
+                        name: result.user.name,
+                        email: result.user.email,
+                        role: result.user.role,
+                        customRole: customRole,
+                        isDeveloper: result.user.isDeveloper,
+                        loginTime: new Date().toISOString()
+                    };
+                    localStorage.setItem('iset_user', JSON.stringify(sessionUser));
+                    localStorage.setItem('iset_session', JSON.stringify(sessionUser));
+                    showMessage('✅ Compte créé ! Redirection...', 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 1500);
+                } else {
+                    showMessage('❌ ' + result.message, 'error');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+

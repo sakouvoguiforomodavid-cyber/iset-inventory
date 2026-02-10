@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistiques - ISET Magasin</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <style>
+        :root {
+            --color-primary: #2c3e50;
+            --color-secondary: #3498db;
+            --color-success: #27ae60;
+            --color-warning: #f39c12;
+            --color-danger: #e74c3c;
+            --color-light: #ecf0f1;
+            --color-text: #2c3e50;
+            --color-border: #bdc3c7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ecf0f1 0%, #bdc3c7 100%);
+            min-height: 100vh;
+            color: var(--color-text);
+            padding: 20px;
+        }
+
+        .navbar {
+            background: var(--color-primary);
+            color: white;
+            padding: 20px 30px;
+            margin: -20px -20px 30px -20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .navbar-buttons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--color-secondary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: var(--color-danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--color-primary);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border-left: 5px solid var(--color-secondary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .stat-card.success {
+            border-left-color: var(--color-success);
+        }
+
+        .stat-card.warning {
+            border-left-color: var(--color-warning);
+        }
+
+        .stat-card.danger {
+            border-left-color: var(--color-danger);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-description {
+            font-size: 13px;
+            color: #95a5a6;
+        }
+
+        .stat-card.success .stat-value {
+            color: var(--color-success);
+        }
+
+        .stat-card.warning .stat-value {
+            color: var(--color-warning);
+        }
+
+        .stat-card.danger .stat-value {
+            color: var(--color-danger);
+        }
+
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 25px;
+            background: var(--color-secondary);
+            border-radius: 2px;
+        }
+
+        .category-list {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .category-item {
+            background: var(--color-light);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--color-secondary);
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 5px;
+        }
+
+        .category-count {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-secondary);
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .user-card {
+            background: var(--color-light);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--color-primary);
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--color-secondary);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .user-email {
+            font-size: 13px;
+            color: #7f8c8d;
+            word-break: break-all;
+        }
+
+        .chart-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .chart {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--color-primary);
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bar-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .bar-label {
+            min-width: 120px;
+            font-weight: 600;
+            color: var(--color-primary);
+            font-size: 14px;
+        }
+
+        .bar {
+            flex: 1;
+            height: 30px;
+            background: linear-gradient(90deg, var(--color-secondary), #3498db);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bar-value {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .summary-item {
+            background: var(--color-light);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #7f8c8d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--color-secondary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #95a5a6;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ecf0f1;
+            border-top-color: var(--color-secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>📊 Statistiques</h1>
+        <div class="navbar-buttons">
+            <button class="btn btn-primary" onclick="location.href='dashboard.html'">← Retour Dashboard</button>
+            <button class="btn btn-danger" onclick="logoutUser()">Déconnexion</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="page-title">Tableau de Bord Statistiques</div>
+
+        <!-- Indicateurs Clés -->
+        <div class="stats-grid">
+            <div class="stat-card success">
+                <div class="stat-label">📦 Articles Total</div>
+                <div class="stat-value" id="totalItems">0</div>
+                <div class="stat-description">Nombre total d'articles en inventaire</div>
+            </div>
+
+            <div class="stat-card warning">
+                <div class="stat-label">⚠️ Stock Faible</div>
+                <div class="stat-value" id="lowStockCount">0</div>
+                <div class="stat-description">Articles en dessous du seuil</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">👥 Utilisateurs</div>
+                <div class="stat-value" id="userCount">0</div>
+                <div class="stat-description">Comptes utilisateurs actifs</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">📂 Catégories</div>
+                <div class="stat-value" id="categoryCount">0</div>
+                <div class="stat-description">Nombre de catégories</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-label">📋 Dernière Mise à Jour</div>
+                <div class="stat-value" id="lastUpdate">--/--/--</div>
+                <div class="stat-description">Date de dernière modification</div>
+            </div>
+        </div>
+
+        <!-- Graphiques -->
+        <div class="chart-container">
+            <div class="chart">
+                <div class="chart-title">📈 Distribution par Catégorie</div>
+                <div class="bar-chart" id="categoryChart">
+                    <div class="empty-state">Chargement des données...</div>
+                </div>
+            </div>
+
+            <div class="chart">
+                <div class="chart-title">📊 Status Stock</div>
+                <div class="bar-chart" id="stockChart">
+                    <div class="empty-state">Chargement des données...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Détails par Catégorie -->
+        <div class="section">
+            <h2 class="section-title">Articles par Catégorie</h2>
+            <div id="categoryDetails">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📦</div>
+                    <p>Aucune catégorie trouvée</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles en Stock Faible -->
+        <div class="section">
+            <h2 class="section-title">⚠️ Articles en Stock Faible</h2>
+            <div id="lowStockSection">
+                <div class="empty-state">
+                    <div class="empty-state-icon">✓</div>
+                    <p>Aucun article en stock faible</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gestion des Utilisateurs -->
+        <div class="section">
+            <h2 class="section-title">Utilisateurs Enregistrés</h2>
+            <div id="usersSection">
+                <div class="empty-state">
+                    <div class="empty-state-icon">👥</div>
+                    <p>Aucun utilisateur trouvé</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="section">
+            <h2 class="section-title">Actions</h2>
+            <div class="action-buttons">
+                <button class="btn btn-primary btn-small" onclick="refreshStats()">🔄 Rafraîchir</button>
+                <button class="btn btn-primary btn-small" onclick="exportStatsCSV()">📥 Exporter CSV</button>
+                <button class="btn btn-primary btn-small" onclick="exportStatsPDF()">📄 Exporter PDF</button>
+                <button class="btn btn-primary btn-small" onclick="printStats()">🖨️ Imprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../scripts/auth.js"></script>
+    <script src="../scripts/script.js"></script>
+    <script src="../scripts/stats-display.js"></script>
+    <script>
+        // === GESTION DES STATISTIQUES ===
+        // ⚠️ SÉCURITÉ: SEUL L'ADMIN (et dev) peut voir les statistiques complètes
+        
+        // Vérification stricte des permissions
+        function checkAuthForStats(){
+            const raw = localStorage.getItem('iset_session') || localStorage.getItem('iset_user');
+            if(!raw){
+                alert('⚠️ Veuillez vous connecter d\'abord');
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            const user = JSON.parse(raw);
+            const role = user.role;
+            const isDev = user.isDeveloper;
+            
+            // ✅ Admin, Dev et Magasinier peuvent voir les statistiques
+            if(!isDev && role !== 'admin' && role !== 'magasinier'){
+                alert(`⛔ ACCÈS REFUSÉ!\nVous êtes connecté en tant que: ${role}\n\n✅ Admin, Magasinier (et Développeur) peuvent voir les statistiques.\n\nVous avez accès à:\n- Dashboard: Vue d'ensemble\n- Inventaire en ligne: Consultation`);
+                console.error(`TENTATIVE D'ACCÈS NON AUTORISÉ aux statistiques - Rôle: ${role}`);
+                window.location.href = 'dashboard.html';
+                return false;
+            }
+            
+            console.log(`✅ Accès stats autorisé pour ${role}`);
+            return true;
+        }
+
+        // Vérifier les permissions avant de tout charger
+        if(!checkAuthForStats()){
+            throw new Error('Accès non autorisé');
+        }
+        
+        // Je récupère l'inventaire stocké côté navigateur
+        function getInventory(){
+            const raw = localStorage.getItem('iset_inventory');
+            if(!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch(e) {
+                console.error('Erreur parsing inventaire:', e);
+                return [];
+            }
+        }
+
+        // Je lis la liste des utilisateurs gardés en local
+        function getAllUsers(){
+            const raw = localStorage.getItem('iset_all_users');
+            if(!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch(e) {
+                console.error('Erreur parsing utilisateurs:', e);
+                return [];
+            }
+        }
+
+        // Je charge les catégories enregistrées
+        function getCategories(){
+            const raw = localStorage.getItem('iset_categories');
+            if(!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch(e) {
+                console.error('Erreur parsing catégories:', e);
+                return [];
+            }
+        }
+
+        // Je récupère mes réglages (seuils, options)
+        function getSettings(){
+            const raw = localStorage.getItem('iset_system_settings');
+            if(!raw) return {};
+            try {
+                return JSON.parse(raw);
+            } catch(e) {
+                return {};
+            }
+        }
+
+        // Je calcule tous les chiffres utiles pour les cartes
+        function calculateStats(){
+            const items = getInventory();
+            const users = getAllUsers();
+            const categories = getCategories();
+            const settings = getSettings();
+            const lowStockThreshold = settings.lowStockThreshold || 5;
+
+            const stats = {
+                totalItems: items.length,
+                lowStock: items.filter(i => i.qty < lowStockThreshold).length,
+                userCount: users.length,
+                categoryCount: categories.length,
+                totalValue: items.reduce((sum, item) => sum + (item.prix * item.qty), 0),
+                categories: {},
+                lowStockItems: items.filter(i => i.qty < lowStockThreshold).sort((a, b) => a.qty - b.qty),
+                stockStatus: {
+                    inStock: items.filter(i => i.qty > lowStockThreshold).length,
+                    lowStock: items.filter(i => i.qty < lowStockThreshold && i.qty > 0).length,
+                    outOfStock: items.filter(i => i.qty <= 0).length
+                }
+            };
+
+            // Compter articles par catégorie
+            items.forEach(item => {
+                const cat = item.categorie || 'Non catégorisé';
+                if(!stats.categories[cat]) {
+                    stats.categories[cat] = { count: 0, value: 0, items: [] };
+                }
+                stats.categories[cat].count++;
+                stats.categories[cat].value += item.prix * item.qty;
+                stats.categories[cat].items.push(item);
+            });
+
+            return stats;
+        }
+
+        // Je pousse les chiffres à l'écran et rafraîchis les blocs
+        function updateStatDisplay(){
+            const stats = calculateStats();
+
+            // Mise à jour des indicateurs
+            document.getElementById('totalItems').textContent = stats.totalItems;
+            document.getElementById('lowStockCount').textContent = stats.lowStock;
+            document.getElementById('userCount').textContent = stats.userCount;
+            document.getElementById('categoryCount').textContent = stats.categoryCount;
+
+            // Dernière mise à jour
+            const now = new Date();
+            const date = now.toLocaleDateString('fr-FR');
+            document.getElementById('lastUpdate').textContent = date;
+
+            // Graphique catégories
+            updateCategoryChart(stats.categories);
+
+            // Graphique stock
+            updateStockChart(stats.stockStatus);
+
+            // Détails catégories
+            updateCategoryDetails(stats.categories);
+
+            // Articles en stock faible
+            updateLowStockSection(stats.lowStockItems);
+
+            // Utilisateurs
+            updateUsersSection(getAllUsers());
+        }
+
+        // Je dessine le graphe des catégories
+        function updateCategoryChart(categories){
+            const container = document.getElementById('categoryChart');
+            const entries = Object.entries(categories).sort((a, b) => b[1].count - a[1].count);
+
+            if(entries.length === 0){
+                container.innerHTML = '<div class="empty-state"><p>Aucune catégorie</p></div>';
+                return;
+            }
+
+            const maxCount = Math.max(...entries.map(e => e[1].count));
+            let html = '';
+
+            entries.forEach(([cat, data]) => {
+                const percentage = (data.count / maxCount) * 100;
+                html += `
+                    <div class="bar-item">
+                        <div class="bar-label">${cat}</div>
+                        <div class="bar" style="width: ${Math.max(20, percentage)}%">
+                            <div class="bar-value">${data.count}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Je dessine le graphe des niveaux de stock
+        function updateStockChart(stockStatus){
+            const container = document.getElementById('stockChart');
+            const total = stockStatus.inStock + stockStatus.lowStock + stockStatus.outOfStock;
+
+            if(total === 0){
+                container.innerHTML = '<div class="empty-state"><p>Aucun article</p></div>';
+                return;
+            }
+
+            const maxCount = Math.max(stockStatus.inStock, stockStatus.lowStock, stockStatus.outOfStock);
+
+            const html = `
+                <div class="bar-item">
+                    <div class="bar-label">En Stock</div>
+                    <div class="bar" style="width: ${Math.max(20, (stockStatus.inStock / maxCount) * 100)}%; background: linear-gradient(90deg, #27ae60, #2ecc71);">
+                        <div class="bar-value">${stockStatus.inStock}</div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Stock Faible</div>
+                    <div class="bar" style="width: ${Math.max(20, (stockStatus.lowStock / maxCount) * 100)}%; background: linear-gradient(90deg, #f39c12, #f1c40f);">
+                        <div class="bar-value">${stockStatus.lowStock}</div>
+                    </div>
+                </div>
+                <div class="bar-item">
+                    <div class="bar-label">Rupture</div>
+                    <div class="bar" style="width: ${Math.max(20, (stockStatus.outOfStock / maxCount) * 100)}%; background: linear-gradient(90deg, #e74c3c, #e67e22);">
+                        <div class="bar-value">${stockStatus.outOfStock}</div>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        // Je détaille chaque catégorie avec son volume
+        function updateCategoryDetails(categories){
+            const container = document.getElementById('categoryDetails');
+            const entries = Object.entries(categories).sort((a, b) => b[1].count - a[1].count);
+
+            if(entries.length === 0){
+                container.innerHTML = '<div class="empty-state"><p>Aucune catégorie</p></div>';
+                return;
+            }
+
+            let html = '<div class="category-list">';
+            entries.forEach(([cat, data]) => {
+                html += `
+                    <div class="category-item">
+                        <div class="category-name">${cat}</div>
+                        <div class="category-count">${data.count}</div>
+                        <div class="stat-description">Valeur: ${data.value.toFixed(2)} €</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // Je liste les articles en stock faible
+        function updateLowStockSection(items){
+            const container = document.getElementById('lowStockSection');
+
+            if(items.length === 0){
+                container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✓</div><p>Aucun article en stock faible</p></div>';
+                return;
+            }
+
+            let html = '<table style="width:100%; border-collapse: collapse;">';
+            html += '<thead><tr style="background: #f8f9fa; border-bottom: 2px solid #bdc3c7;"><th style="padding: 12px; text-align: left;">Article</th><th style="padding: 12px; text-align: left;">Catégorie</th><th style="padding: 12px; text-align: center;">Quantité</th><th style="padding: 12px; text-align: right;">Prix Unitaire</th></tr></thead><tbody>';
+
+            items.forEach(item => {
+                html += `
+                    <tr style="border-bottom: 1px solid #ecf0f1;">
+                        <td style="padding: 12px;">${item.nom}</td>
+                        <td style="padding: 12px;">${item.categorie || 'N/A'}</td>
+                        <td style="padding: 12px; text-align: center; color: ${item.qty <= 0 ? '#e74c3c' : '#f39c12'}; font-weight: 600;">${item.qty}</td>
+                        <td style="padding: 12px; text-align: right;">${item.prix || 0} €</td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Je montre qui est enregistré dans le système
+        function updateUsersSection(users){
+            const container = document.getElementById('usersSection');
+
+            if(users.length === 0){
+                container.innerHTML = '<div class="empty-state"><p>Aucun utilisateur</p></div>';
+                return;
+            }
+
+            let html = '<div class="users-grid">';
+            users.forEach(user => {
+                html += `
+                    <div class="user-card">
+                        <div class="user-name">👤 ${user.nom || 'N/A'}</div>
+                        <div class="user-role">${user.role || 'Visiteur'}</div>
+                        <div class="user-email">${user.email || 'N/A'}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            container.innerHTML = html;
+        }
+
+        // Je déclenche un refresh manuel des stats
+        function refreshStats(){
+            updateStatDisplay();
+            showNotification('Statistiques rafraîchies ✓', 'success');
+        }
+
+        // Je génère un export CSV des stats et articles
+        function exportStatsCSV(){
+            const stats = calculateStats();
+            const items = getInventory();
+            
+            let csv = 'Statistiques ISET Magasin\n';
+            csv += new Date().toLocaleString('fr-FR') + '\n\n';
+            
+            csv += 'RESUME\n';
+            csv += 'Articles Total,' + stats.totalItems + '\n';
+            csv += 'Stock Faible,' + stats.lowStock + '\n';
+            csv += 'Utilisateurs,' + stats.userCount + '\n';
+            csv += 'Catégories,' + stats.categoryCount + '\n';
+            csv += 'Valeur Total,' + stats.totalValue.toFixed(2) + '\n\n';
+            
+            csv += 'ARTICLES\n';
+            csv += 'Nom,Catégorie,Quantité,Prix Unitaire,Valeur\n';
+            items.forEach(item => {
+                csv += `"${item.nom}","${item.categorie || 'N/A'}",${item.qty},${item.prix},${(item.prix * item.qty).toFixed(2)}\n`;
+            });
+
+            downloadFile(csv, 'stats-' + new Date().getTime() + '.csv');
+        }
+
+        // Placeholder: export PDF à venir
+        function exportStatsPDF(){
+            alert('Export PDF disponible bientôt - Utiliser la fonction Imprimer pour l\'instant');
+        }
+
+        // Impression rapide de la page
+        function printStats(){
+            window.print();
+        }
+
+        // Je gère le téléchargement d'un fichier texte
+        function downloadFile(content, filename){
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
+
+        // Petit toast maison pour signaler une action
+        function showNotification(message, type = 'info'){
+            const div = document.createElement('div');
+            div.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${type === 'success' ? '#27ae60' : '#3498db'};
+                color: white;
+                border-radius: 5px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 9999;
+                animation: slideIn 0.3s ease;
+            `;
+            div.textContent = message;
+            document.body.appendChild(div);
+            setTimeout(() => div.remove(), 3000);
+        }
+
+        // Je purge la session locale et retourne au login
+        function logoutUser(){
+            localStorage.removeItem('iset_user_logged');
+            localStorage.removeItem('iset_current_user');
+            location.href = 'login.html';
+        }
+
+        // Initialiser au chargement
+        document.addEventListener('DOMContentLoaded', function(){
+            updateStatDisplay();
+
+            // Rafraîchir chaque minute
+            setInterval(updateStatDisplay, 60000);
+        });
+
+        // Ajouter style pour l'impression
+        const style = document.createElement('style');
+        style.textContent = `
+            @media print {
+                .navbar, .action-buttons { display: none; }
+                body { background: white; }
+                .section, .chart { page-break-inside: avoid; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

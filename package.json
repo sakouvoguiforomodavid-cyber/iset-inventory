@@ -1,0 +1,63 @@
+{
+  "name": "iset-inventory-management",
+  "version": "2.0.0",
+  "description": "Système de gestion de stock pour l'ISET - Développé par Foromo Sakouvogui dans le cadre de son stage d'initiation",
+  "main": "src/pages/index.html",
+  "author": {
+    "name": "Foromo SAKOUVOGUI",
+    "email": "foromo.sakouvogui@iset.tn",
+    "institution": "Institut Supérieur des Études Technologiques",
+    "level": "L1"
+  },
+  "license": "MIT",
+  "_notes": [
+    "Ce package.json agit surtout comme fiche d'identité: l'app tourne en HTML/JS statiques sans build Node.",
+    "Les scripts servent de mémo pour lancer un petit serveur local ou rappeler où ouvrir l'app."
+  ],
+  "copyright": "© 2026 Foromo Sakouvogui - Tous droits réservés",
+  "keywords": [
+    "inventory",
+    "stock-management",
+    "gestion-stock",
+    "iset",
+    "javascript",
+    "html5",
+    "css3",
+    "localstorage",
+    "export-excel",
+    "export-pdf"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/foromo-sakouvogui/iset-inventory.git"
+  },
+  "scripts": {
+    "start": "echo 'Ouvrez src/pages/index.html dans votre navigateur'",
+    "serve": "python -m http.server 8000 --directory src/pages",
+    "clean": "echo 'Nettoyage du projet...'",
+    "docs": "echo 'Consultez le dossier docs/'"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "browserslist": [
+    "last 2 versions",
+    "> 1%",
+    "not dead"
+  ],
+  "config": {
+    "project": {
+      "name": "ISET Inventory Management System",
+      "stage": "Stage d'initiation L1",
+      "date": "Janvier 2026",
+      "status": "Production",
+      "version_history": {
+        "2.0.0": "Restructuration complète + Refactoring Prix→Marque",
+        "1.5.0": "Ajout Import CSV et Export Excel/PDF",
+        "1.0.0": "Version initiale stable"
+      }
+    }
+  }
+}

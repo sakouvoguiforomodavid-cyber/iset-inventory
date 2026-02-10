@@ -1,0 +1,155 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion - ISET Magasin</title>
+    <link rel="stylesheet" href="../styles/style.css">
+</head>
+<body>
+
+    <header>
+        <nav>
+            <div class="logo">ISET Magasin</div>
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="dashboard.html">Tableau de bord</a></li>
+                <li><a href="browse-inventory.html" title="Consulter l'inventaire en ligne">📦 Inventaire en ligne</a></li>
+                <li><a href="stats.html">Statistiques</a></li>
+                <li><a href="gestion.html" class="active">Gestion</a></li>
+                <li><a href="#" id="logoutBtn">Déconnexion</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="header-dashboard">
+            <h1>Gestion</h1>
+            <p id="welcome"></p>
+        </div>
+
+        <!-- Cartes de gestion -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 30px 0;">
+            
+            <!-- Inventaire en ligne -->
+            <div class="card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-top: 4px solid #3498db;">
+                <h3>📦 Inventaire en ligne</h3>
+                <p>Consultez l'inventaire complet en temps réel avec statistiques détaillées et recherche avancée.</p>
+                <a href="browse-inventory.html" class="btn-primary" style="display: inline-block; margin-top: 15px; text-decoration: none; padding: 10px 20px; background-color: #3498db; color: white; border-radius: 4px; font-weight: bold;">Accéder</a>
+            </div>
+
+            <!-- Entrée de stock -->
+            <div class="card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-top: 4px solid #27ae60;">
+                <h3>📥 Nouvelle entrée</h3>
+                <p>Enregistrer l'arrivée de nouveaux articles ou l'augmentation de stock.</p>
+                <button class="btn-primary" onclick="navigateToDashboardAndOpen('entry')" style="margin-top: 15px; background-color: #27ae60;">Enregistrer entrée</button>
+            </div>
+
+            <!-- Sortie de stock -->
+            <div class="card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-top: 4px solid #e74c3c;">
+                <h3>📤 Nouvelle sortie</h3>
+                <p>Enregistrer la sortie d'articles (vente, casse, transfert, etc.).</p>
+                <button class="btn-primary" onclick="navigateToDashboardAndOpen('exit')" style="margin-top: 15px; background-color: #e74c3c;">Enregistrer sortie</button>
+            </div>
+
+            <!-- Ajouter article -->
+            <div class="card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-top: 4px solid #9b59b6;">
+                <h3>➕ Ajouter article</h3>
+                <p>Ajouter un nouvel article à l'inventaire avec ses détails (nom, catégorie, prix, etc.).</p>
+                <button class="btn-primary" onclick="navigateToDashboardAndOpen('add')" style="margin-top: 15px; background-color: #9b59b6;">Ajouter</button>
+            </div>
+
+            <!-- Importer CSV -->
+            <div class="card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-top: 4px solid #f39c12;">
+                <h3>📥 Importer Excel/CSV</h3>
+                <p>Importer plusieurs articles à la fois via un fichier CSV ou Excel.</p>
+                <button class="btn-primary" onclick="navigateToDashboardAndOpen('import')" style="margin-top: 15px; background-color: #f39c12;">Importer</button>
+            </div>
+
+            <!-- Exporter CSV -->
+            <div class="card" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-top: 4px solid #16a085;">
+                <h3>📤 Exporter (CSV)</h3>
+                <p>Télécharger l'inventaire complet au format CSV pour traitement externe.</p>
+                <button class="btn-primary" onclick="navigateToDashboardAndOpen('export')" style="margin-top: 15px; background-color: #16a085;">Exporter</button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <style>
+        .card {
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+        }
+        .btn-primary {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+            color: white;
+        }
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+    </style>
+
+    <script>
+        // ⚠️ SÉCURITÉ: SEUL L'ADMIN (et dev) peut accéder à la gestion
+        document.addEventListener('DOMContentLoaded', function(){
+            let session = localStorage.getItem('iset_session') || localStorage.getItem('iset_user');
+            if(!session){
+                alert('⚠️ Veuillez d\'abord vous connecter');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const user = JSON.parse(session);
+            const role = user.role;
+            const isDev = user.isDeveloper;
+            
+            // ✅ Vérification stricte: Admin, Magasinier et dev peuvent accéder à la gestion
+            if(!isDev && role !== 'admin' && role !== 'magasinier'){
+                alert(`⛔ ACCÈS REFUSÉ!\nVous êtes connecté en tant que: ${role}\n\n✅ Admin et Magasinier (et Développeur) peuvent accéder à cette page.\n\nVous avez accès à:\n- Dashboard: Vue d'ensemble\n- Inventaire en ligne: Consultation`);
+                console.error(`TENTATIVE D'ACCÈS NON AUTORISÉ à la gestion - Rôle: ${role}`);
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            
+            console.log(`✅ Accès gestion autorisé pour ${role}`);
+            
+            const welcome = document.getElementById('welcome');
+            if(welcome){
+                welcome.textContent = `Bienvenue ${user.name} (${role})`;
+            }
+
+            // Gère la déconnexion
+            const logoutBtn = document.getElementById('logoutBtn');
+            if(logoutBtn){
+                logoutBtn.addEventListener('click', function(e){
+                    e.preventDefault();
+                    localStorage.removeItem('iset_user');
+                    localStorage.removeItem('iset_session');
+                    window.location.href = 'login.html';
+                });
+            }
+        });
+
+        // Navigue vers le dashboard et ouvre un modal spécifique
+        function navigateToDashboardAndOpen(action) {
+            // Stocke l'action à ouvrir
+            sessionStorage.setItem('openModal', action);
+            // Redirige vers le dashboard
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+
+</body>
+</html>
+
+

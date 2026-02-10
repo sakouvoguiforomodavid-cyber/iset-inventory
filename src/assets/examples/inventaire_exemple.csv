@@ -1,0 +1,11 @@
+ID,Nom,Catégorie,Quantité,Prix unitaire,Emplacement,Notes
+P001,Clavier USB,Périphériques,25,45.50,Rayon A,Clavier standard
+P002,Souris sans fil,Périphériques,30,28.00,Rayon A,Souris optique 2.4GHz
+P003,Écran 24 pouces,Moniteurs,5,320.00,Rayon B,FHD 1920x1080
+P004,Câble HDMI,Câbles,100,15.00,Rayon C,2m haute vitesse
+P005,Hub USB 4 ports,Accessoires,45,35.00,Rayon D,Alimentation USB
+P006,Casque audio,Périphériques,12,89.50,Rayon E,Avec microphone
+P007,Webcam HD,Périphériques,8,75.00,Rayon E,1080p 30fps
+P008,Batterie externe,Accessoires,20,55.00,Rayon F,10000mAh
+P009,Chargeur rapide USB-C,Accessoires,35,42.00,Rayon F,65W
+P010,Support smartphone,Accessoires,50,12.00,Rayon G,Ajustable

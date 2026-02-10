@@ -1,0 +1,270 @@
+/* ============================================
+   STYLES TABLEAU INVENTAIRE - STYLE EXCEL
+   ============================================ */
+
+/* Conteneur du tableau avec scrolling */
+#inventoryTableContainer {
+    display: none;
+    overflow-x: auto;
+    overflow-y: auto;
+    max-height: 600px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    background: white;
+}
+
+/* Style tableau inspiré Excel */
+.inventory-table-enhanced {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.inventory-table-enhanced thead {
+    background: linear-gradient(135deg, #0e2a36 0%, #1a3a45 100%);
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.inventory-table-enhanced th {
+    padding: 12px 10px;
+    text-align: left;
+    font-weight: 600;
+    border-right: 1px solid rgba(255,255,255,0.2);
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+    white-space: nowrap;
+    user-select: none;
+}
+
+.inventory-table-enhanced th:last-child {
+    border-right: none;
+}
+
+.inventory-table-enhanced tbody tr {
+    border-bottom: 1px solid #e8e8e8;
+    transition: background-color 0.2s ease;
+}
+
+.inventory-table-enhanced tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+.inventory-table-enhanced tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.inventory-table-enhanced td {
+    padding: 10px;
+    border-right: 1px solid #f0f0f0;
+    max-width: 150px;
+    word-wrap: break-word;
+}
+
+.inventory-table-enhanced td:last-child {
+    border-right: none;
+}
+
+/* Colonne ID - fixe */
+.inventory-table-enhanced td:first-child {
+    font-weight: 600;
+    color: #0e2a36;
+    background-color: #f5f5f5;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+}
+
+/* Colonne Quantité avec alerte stock faible */
+.qty-low-stock {
+    color: #d9534f;
+    font-weight: bold;
+    background-color: #fdeaea;
+}
+
+.qty-normal {
+    color: #27ae60;
+}
+
+/* Colonne Prix */
+.inventory-table-enhanced td:nth-child(5),
+.inventory-table-enhanced td:nth-child(6) {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Ligne de saisie rapide */
+#quickAddRow {
+    background-color: #e8f4f8 !important;
+    border-top: 2px dashed #0e2a36 !important;
+    border-bottom: 2px dashed #0e2a36 !important;
+}
+
+#quickAddRow:hover {
+    background-color: #d4e8f0 !important;
+}
+
+#quickAddRow td {
+    padding: 8px 5px;
+    border-right: 1px solid #d0d0d0;
+}
+
+/* Inputs dans la ligne de saisie rapide */
+#quickAddRow input {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    font-size: 12px;
+    font-family: inherit;
+}
+
+#quickAddRow input:focus {
+    outline: none;
+    border-color: #0e2a36;
+    background-color: #fffacd;
+    box-shadow: 0 0 3px rgba(14,42,54,0.3);
+}
+
+/* Boutons dans la ligne de saisie */
+#quickAddBtn, #quickClearBtn {
+    padding: 6px 10px;
+    font-size: 12px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+#quickAddBtn {
+    background-color: #27ae60;
+    color: white;
+    margin-right: 5px;
+}
+
+#quickAddBtn:hover {
+    background-color: #229954;
+    box-shadow: 0 2px 5px rgba(39,174,96,0.3);
+}
+
+#quickClearBtn {
+    background-color: #95a5a6;
+    color: white;
+}
+
+#quickClearBtn:hover {
+    background-color: #7f8c8d;
+}
+
+/* Affichage de la valeur totale */
+#quickValue {
+    font-weight: bold;
+    color: #0e2a36;
+}
+
+/* Boutons d'action dans le tableau */
+.btn-edit, .btn-delete {
+    padding: 5px 8px;
+    margin: 2px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-edit {
+    background-color: #3498db;
+    color: white;
+}
+
+.btn-edit:hover {
+    background-color: #2980b9;
+    box-shadow: 0 2px 5px rgba(52,152,219,0.3);
+}
+
+.btn-delete {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #c0392b;
+    box-shadow: 0 2px 5px rgba(231,76,60,0.3);
+}
+
+/* Section d'actions */
+#inventoryControls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 15px 0;
+    align-items: center;
+}
+
+#searchInput {
+    flex: 1;
+    min-width: 200px;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+#searchInput:focus {
+    outline: none;
+    border-color: #0e2a36;
+    box-shadow: 0 0 5px rgba(14,42,54,0.2);
+}
+
+/* Titre cliquable */
+#inventoryTitle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+    padding: 10px;
+    margin: -10px;
+    border-radius: 4px;
+}
+
+#inventoryTitle:hover {
+    background-color: #f0f0f0;
+}
+
+#toggleIcon {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    font-size: 18px;
+}
+
+/* Responsive - Mobile */
+@media (max-width: 768px) {
+    .inventory-table-enhanced {
+        font-size: 11px;
+    }
+
+    .inventory-table-enhanced th,
+    .inventory-table-enhanced td {
+        padding: 6px 4px;
+    }
+
+    #inventoryControls {
+        flex-direction: column;
+    }
+
+    #searchInput {
+        width: 100%;
+    }
+
+    #inventoryTableContainer {
+        max-height: 400px;
+    }
+}

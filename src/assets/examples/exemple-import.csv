@@ -1,0 +1,11 @@
+id,name,category,qty,price,location
+P001,Clavier USB,Informatique,25,45.00,Rayon A
+P002,Souris Optique,Informatique,40,25.50,Rayon A
+P003,Disque Dur 1TB,Stockage,10,120.00,Rayon B
+P004,Écran LCD 24",Électronique,8,280.00,Rayon C
+P005,Batterie Externe 20000mAh,Accessoires,15,65.00,Rayon D
+P006,Câble USB-C,Accessoires,100,8.50,Rayon A
+P007,Hub USB 7 ports,Informatique,5,55.00,Rayon B
+P008,Adaptateur HDMI,Accessoires,30,12.00,Rayon C
+P009,Ventilateur USB,Informatique,18,35.00,Rayon D
+P010,Webcam HD 1080p,Électronique,6,95.00,Rayon C

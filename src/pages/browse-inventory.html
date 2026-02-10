@@ -1,0 +1,361 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Consultation d'inventaire - ISET Magasin</title>
+    <link rel="stylesheet" href="../styles/style.css">
+    <link rel="stylesheet" href="../styles/inventory-table.css">
+    <style>
+        .browse-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .browse-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+            border-bottom: 2px solid #0e2a36;
+        }
+        .browse-header h1 {
+            color: #0e2a36;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .browse-header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .browse-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card-browse {
+            background: linear-gradient(135deg, #0e2a36 0%, #203844 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .stat-card-browse h3 {
+            margin: 0 0 10px 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        .stat-card-browse .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        .search-section {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        .search-section h2 {
+            color: #0e2a36;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .search-controls {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 10px;
+        }
+        .search-controls input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .search-controls button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn-search {
+            background-color: #3498db;
+            color: white;
+        }
+        .btn-search:hover {
+            background-color: #2980b9;
+        }
+        .btn-reset {
+            background-color: #95a5a6;
+            color: white;
+        }
+        .btn-reset:hover {
+            background-color: #7f8c8d;
+        }
+        .inventory-section {
+            margin-top: 30px;
+        }
+        .inventory-info {
+            background: #e8f4f8;
+            padding: 15px;
+            border-left: 4px solid #0e2a36;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 768px) {
+            .search-controls {
+                grid-template-columns: 1fr;
+            }
+            .browse-header h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="browse-container">
+        <div class="browse-header">
+            <h1>📦 Inventaire en ligne</h1>
+            <p>Consultation complète et mise à jour en temps réel de nos articles</p>
+        </div>
+
+        <!-- Statistiques rapides -->
+        <div class="browse-stats" id="browseStats">
+            <div class="stat-card-browse">
+                <h3>Articles en stock</h3>
+                <div class="value" id="browseTotalItems">0</div>
+            </div>
+            <div class="stat-card-browse">
+                <h3>Articles disponibles</h3>
+                <div class="value" id="browseAvailableItems">0</div>
+            </div>
+            <div class="stat-card-browse">
+                <h3>Stock critique (< 5)</h3>
+                <div class="value" id="browseLowStockItems">0</div>
+            </div>
+            <div class="stat-card-browse">
+                <h3>Total d'équipements</h3>
+                <div class="value" id="browseTotalEquipment">0</div>
+            </div>
+        </div>
+
+        <!-- Section de recherche -->
+        <div class="search-section">
+            <h2>🔍 Recherche</h2>
+            <div class="search-controls">
+                <input type="text" id="browseSearchInput" placeholder="Rechercher par ID, nom, catégorie ou emplacement..." />
+                <button class="btn-search" onclick="document.getElementById('browseSearchInput').dispatchEvent(new Event('keyup'))">🔎 Chercher</button>
+                <button class="btn-reset" onclick="resetBrowseSearch()">🔄 Réinitialiser</button>
+                <button class="btn-clean" onclick="manualCleanData()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; margin-left: 10px;" title="Nettoyer les données corrompues">🧹 Nettoyer</button>
+            </div>
+        </div>
+
+        <!-- Tableau d'inventaire -->
+        <div class="inventory-section">
+            <div class="inventory-info">
+                ✓ Les données sont mises à jour en temps réel
+                • <span id="browseItemCount">0</span> article(s) affiché(s)
+            </div>
+
+            <div class="table-wrapper" id="browseTableWrapper">
+                <table id="browseInventoryTable" class="inventory-table-enhanced">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Catégorie</th>
+                            <th>Marque</th>
+                            <th>Quantité</th>
+                            <th>Emplacement</th>
+                        </tr>
+                    </thead>
+                    <tbody id="browseInventoryBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="browseEmptyState" class="empty-state" style="display: none;">
+                <div class="empty-state-icon">📭</div>
+                <p>Aucun article ne correspond à votre recherche</p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <hr style="margin-top: 40px; border: none; border-top: 1px solid #ddd;">
+        <p style="text-align: center; color: #999; font-size: 0.9em; margin-top: 20px;">
+            Système de gestion d'inventaire ISET Magasin v2.0 | © 2026 ISET
+        </p>
+    </div>
+
+    <script>
+        // Initialise d'abord les données de démonstration
+        (function(){
+            const existing = localStorage.getItem('iset_inventory');
+            if(!existing){
+                const demoItems = [
+                    { id: 'P001', name: 'Clavier USB', category: 'Périphériques', brand: 'Logitech', qty: 25, location: 'Rayon A', date: new Date().toISOString() },
+                    { id: 'P002', name: 'Souris sans fil', category: 'Périphériques', brand: 'Corsair', qty: 30, location: 'Rayon A', date: new Date().toISOString() },
+                    { id: 'P003', name: 'Écran 24 pouces', category: 'Moniteurs', brand: 'LG', qty: 5, location: 'Rayon B', date: new Date().toISOString() },
+                    { id: 'P004', name: 'Câble HDMI', category: 'Câbles', brand: 'ASUS', qty: 100, location: 'Rayon C', date: new Date().toISOString() },
+                    { id: 'P005', name: 'Hub USB 4 ports', category: 'Accessoires', brand: 'Belkin', qty: 45, location: 'Rayon D', date: new Date().toISOString() },
+                    { id: 'P006', name: 'Casque audio', category: 'Périphériques', brand: 'Sony', qty: 12, location: 'Rayon E', date: new Date().toISOString() },
+                    { id: 'P007', name: 'Webcam HD', category: 'Caméras', brand: 'Logitech', qty: 8, location: 'Rayon E', date: new Date().toISOString() },
+                    { id: 'P008', name: 'Unité centrale', category: 'Ordinateurs', brand: 'Dell', qty: 3, location: 'Rayon F', date: new Date().toISOString() },
+                    { id: 'P009', name: 'Chaise de bureau', category: 'Mobilier', brand: 'Steelcase', qty: 8, location: 'Rayon F', date: new Date().toISOString() },
+                    { id: 'P010', name: 'Tableau blanc', category: 'Accessoires', brand: 'Legamaster', qty: 4, location: 'Rayon G', date: new Date().toISOString() }
+                ];
+                localStorage.setItem('iset_inventory', JSON.stringify(demoItems));
+            }
+        })();
+
+        // Récupère l'inventaire du localStorage
+        function getInventory(){
+            const raw = localStorage.getItem('iset_inventory');
+            if(!raw) return [];
+            try {
+                return JSON.parse(raw);
+            } catch(e) {
+                return [];
+            }
+        }
+
+        // Affiche le tableau complet
+        function renderBrowseInventory(items = null){
+            if(!items) items = getInventory();
+            
+            const tbody = document.getElementById('browseInventoryBody');
+            const emptyState = document.getElementById('browseEmptyState');
+            const itemCount = document.getElementById('browseItemCount');
+
+            tbody.innerHTML = '';
+
+            if(items.length === 0){
+                emptyState.style.display = 'block';
+                itemCount.textContent = '0';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            itemCount.textContent = items.length;
+
+            items.forEach(item => {
+                const row = document.createElement('tr');
+                const qtyClass = item.qty < 5 ? 'qty-low-stock' : 'qty-normal';
+                
+                row.innerHTML = `
+                    <td><strong>${item.id}</strong></td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${item.brand || 'Non spécifiée'}</td>
+                    <td class="${qtyClass}"><strong>${item.qty}</strong></td>
+                    <td>${item.location}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Met à jour les statistiques
+        function updateBrowseStats(){
+            const items = getInventory();
+            const total = items.length;
+            const available = items.filter(i => i.qty > 0).length;
+            const lowStock = items.filter(i => i.qty < 5).length;
+            const totalQty = items.reduce((sum, i) => sum + i.qty, 0);
+
+            document.getElementById('browseTotalItems').textContent = total;
+            document.getElementById('browseAvailableItems').textContent = available;
+            document.getElementById('browseLowStockItems').textContent = lowStock;
+            document.getElementById('browseTotalEquipment').textContent = totalQty;
+        }
+
+        // Recherche
+        function searchBrowseInventory(query){
+            if(!query){
+                renderBrowseInventory();
+                return;
+            }
+
+            const items = getInventory();
+            const filtered = items.filter(i =>
+                i.id.toLowerCase().includes(query) ||
+                i.name.toLowerCase().includes(query) ||
+                i.category.toLowerCase().includes(query) ||
+                i.location.toLowerCase().includes(query)
+            );
+
+            renderBrowseInventory(filtered);
+        }
+
+        // Réinitialise la recherche
+        function resetBrowseSearch(){
+            document.getElementById('browseSearchInput').value = '';
+            renderBrowseInventory();
+        }
+        
+        // Nettoyage manuel des données
+        function manualCleanData(){
+            if(!window.cleanCorruptedData){
+                alert('⚠️ Fonction de nettoyage non disponible');
+                return;
+            }
+            
+            if(confirm('🧹 Voulez-vous nettoyer les données corrompues de l\'inventaire?\n\nCette action supprimera tous les articles avec des caractères illisibles.')){
+                const result = window.cleanCorruptedData();
+                
+                if(result.error){
+                    alert('❌ Erreur lors du nettoyage des données');
+                } else if(result.cleaned > 0){
+                    alert(`✅ Nettoyage terminé!\n\n${result.cleaned} article(s) corrompu(s) supprimé(s)\n${result.total} article(s) valide(s) conservé(s)`);
+                    // Rafraîchir l'affichage
+                    renderBrowseInventory();
+                    updateBrowseStats();
+                } else {
+                    alert('✅ Aucune donnée corrompue trouvée!\n\nL\'inventaire est déjà propre.');
+                }
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function(){
+            renderBrowseInventory();
+            updateBrowseStats();
+
+            const searchInput = document.getElementById('browseSearchInput');
+            if(searchInput){
+                searchInput.addEventListener('keyup', function(){
+                    const query = this.value.toLowerCase().trim();
+                    searchBrowseInventory(query);
+                });
+            }
+
+            // Rafraîchit les données toutes les 5 secondes
+            setInterval(function(){
+                updateBrowseStats();
+                if(!document.getElementById('browseSearchInput').value){
+                    renderBrowseInventory();
+                }
+            }, 5000);
+        });
+    </script>
+    
+    <script src="../scripts/data-cleaner.js"></script>
+</body>
+</html>
+
+

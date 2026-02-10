@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Zone développeur — ISET</title>
+  <style>
+    body{font-family:Inter, 'Segoe UI', Tahoma, sans-serif;background:#f5f7fb;color:#1f2937;margin:0;padding:24px}
+    .panel{max-width:1000px;margin:24px auto;background:white;padding:26px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
+    h1{margin:0 0 8px;font-size:1.6rem}
+    .muted{color:#6b7280}
+    .section{margin-top:18px}
+    pre{background:#0b1220;color:#dff;padding:12px;border-radius:6px;overflow:auto}
+    a.btn{display:inline-block;padding:10px 14px;background:#2563eb;color:#fff;border-radius:8px;text-decoration:none}
+  </style>
+</head>
+<body>
+  <script src="../src/scripts/access-guard.js"></script>
+  <div class="panel">
+    <h1>Zone réservée — Développeur</h1>
+    <p class="muted">Contenu sensible accessible uniquement après connexion avec le compte développeur.</p>
+
+    <div class="section">
+      <h2>Instructions de soutenance (privées)</h2>
+      <p>La page suivante contient conseils, comptes de test et checklist destinés à l'auteur et au jury interne. Ne pas rendre ces informations publiques.</p>
+      <ul>
+        <li>Comptes de test : <code>dev@iset.local / dev123</code>, <code>alice@iset.local / alice123</code></li>
+        <li>Checklist de la soutenance : montrez la création de compte, CRUD article, import/export CSV, déconnexion.</li>
+        <li>Notes techniques : architecture, clés d'exemples, et remarques pédagogiques.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>Checklist</h2>
+      <ol>
+        <li>Connexion - création de compte</li>
+        <li>Ajout/édition/suppression d'un article</li>
+        <li>Export CSV</li>
+        <li>Import CSV via interface</li>
+        <li>Déconnexion, vérification des rôles</li>
+      </ol>
+      <p style="margin-top:12px"><a class="btn" href="../src/pages/login.html">Ouvrir la page de connexion</a></p>
+    </div>
+
+    <div class="section">
+      <h2>Fichiers importants</h2>
+      <ul>
+        <li><code>src/scripts/auth-advanced.js</code> - logique d'authentification</li>
+        <li><code>src/scripts/csv-import.js</code> - parser/import CSV</li>
+        <li><code>src/pages/dashboard.html</code> - interface principale après connexion</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
